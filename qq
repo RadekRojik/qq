@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+
+# qq i ->update and instalation
+# qq r ->remove package
+# qq q ->search in DB
+# qq s ->show about package
+# qq u ->upgrade
+# qq cc ->cache cleaning
+
+# test debians apt. If error, ignore it and jump to next test.
+if [[ `which apt` ]] 2> /dev/null ; then
+	# první argument se načte do proměnné co
+	co=$1
+	# posunem argumenty
+	shift 1
+	# akce podle toho co první argument obsahuje
+	case $co in
+		i) apt update && apt install "$@" && apt autoremove
+			exit
+			;;
+		r) apt remove "$@" && apt autoremove
+			exit
+			;;
+		u) apt update && apt dist-upgrade && apt autoremove
+			exit
+			;;
+		q) apt search "$@"
+			exit
+			;;
+		s) apt show "$@"
+			exit
+			;;
+		cc) apt clean
+			exit
+			;;
+		*) apt $co "$@"
+			exit
+			;;
+	esac
+fi
+
+# test Arch &co pacman. If error, ignore it and jump to next test.
+if [[ `which pacman` ]] 2> /dev/null ; then
+	co=$1
+	shift 1
+	case $co in
+		u) pacman -Syu
+			exit
+			;;
+		i) pacman -Syu "$@"
+			exit
+			;;
+		q) pacman -Ss "$@"
+			exit
+			;;
+		s) pacman -Qi "$@" || pacman -Si "$@"
+			exit
+			;;
+		r) pacman -R "$@"
+			exit
+			;;
+		cc) pacman -Scc
+			exit
+			;;
+		*) pacman $co "$@"
+			exit
+			;;
+	esac
+fi
+
+# test voidlinux package manager. If error, ignore it and jump to next test.
+if [[ `which xbps-install` ]] 2> /dev/null ; then
+	co=$1
+	shift 1
+	case $co in
+		u) xbps-install -Su
+			exit
+			;;
+		i) xbps-install -S "$@"
+			exit
+			;;
+		r) xbps-remove -R "$@"
+			exit
+			;;
+		s) xbps-query -R "$@"
+			exit
+			;;
+		q) xbps-query -Rs "$@"
+			exit
+			;;
+		cc) xbps-remove -yO
+			xbps-remove -yo
+			exit
+			;;
+		*) $co "$@"
+			exit
+			;;
+	esac
+fi
+
+echo "Sorry I'm not perfect :("
+exit 1
+
