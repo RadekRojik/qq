@@ -48,7 +48,7 @@ if [[ `which pacman` ]] 2> /dev/null ; then
 		u) pacman -Syu
 			exit
 			;;
-		i) pacman -Syu "$@"
+		i) pacman -S "$@"
 			exit
 			;;
 		q) pacman -Ss "$@"
